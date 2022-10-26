@@ -4,6 +4,9 @@ This project contains code I wrote while following the [Understanding TypeScript
 ### Description
 The __DragAndDrop__ project is written using `TypeScript`.
 
+It contains two lists of projects: an _active_ list and a _finished_ list, and
+items can be dragged and dropped between the lists.
+
 To see the affect of code changes immediately in the browser we use `lite-server`, which is run via `npm start`.
 `lite-server` is a simple _development only_ server which serves a web app (from the `index.html` file in the root directory) on the URL `localhost:3000` (this has the same effect as selecting the full path to the relevant `index.html` file and pasting it into the address bar of a browser). It refreshes whenever HTML or JavaScript changes are made. 
 
