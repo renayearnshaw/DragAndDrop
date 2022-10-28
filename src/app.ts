@@ -1,3 +1,23 @@
+// autobind decorator
+// When we bind a method to another object - such as an event - 'this' binds to the
+// target of the object/event. The decorator overrides this, to ensure that 'this'
+// in our method points to this class
+function autobind(
+  target: any,
+  methodName: string,
+  descriptor: PropertyDescriptor
+) {
+  const originalMethod = descriptor.value;
+  const adjustedDescriptor: PropertyDescriptor = {
+    configurable: true,
+    get() {
+      const boundFn = originalMethod.bind(this);
+      return boundFn;
+    },
+  };
+  return adjustedDescriptor;
+}
+
 class ProjectInput {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
@@ -33,16 +53,14 @@ class ProjectInput {
     this.attach();
   }
 
+  @autobind
   private submitHandler(event: Event) {
     event.preventDefault();
     console.log(this.titleInputElement.value);
   }
 
   private configure() {
-    // We bind the submitHandler method to an event, which binds 'this' to the
-    // target of the event. The bind method overrides this, to ensure that 'this'
-    // in the submitHanlder method points to this class
-    this.element.addEventListener('submit', this.submitHandler.bind(this));
+    this.element.addEventListener('submit', this.submitHandler);
   }
 
   private attach() {
