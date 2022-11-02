@@ -1,3 +1,32 @@
+interface Validatable {
+  value: string | number;
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  min?: number;
+  max?: number;
+}
+
+function validate(input: Validatable) {
+  let isValid = true;
+  if (input.required) {
+    isValid = isValid && input.value.toString().trim().length !== 0;
+  }
+  if (input.minLength != null && typeof input.value === 'string') {
+    isValid = isValid && input.value.length > input.minLength;
+  }
+  if (input.maxLength != null && typeof input.value === 'string') {
+    isValid = isValid && input.value.length < input.maxLength;
+  }
+  if (input.min != null && typeof input.value === 'number') {
+    isValid = isValid && input.value > input.min;
+  }
+  if (input.max != null && typeof input.value === 'number') {
+    isValid = isValid && input.value < input.max;
+  }
+  return isValid;
+}
+
 // autobind decorator
 // When we bind a method to another object - such as an event - 'this' binds to the
 // target of the object/event. The decorator overrides this, to ensure that 'this'
@@ -58,10 +87,26 @@ class ProjectInput {
     const description = this.descriptionInputElement.value;
     const people = this.peopleInputElement.value;
 
+    const titleValidator: Validatable = {
+      value: title,
+      required: true,
+    };
+    const descriptionValidator: Validatable = {
+      value: description,
+      required: true,
+      minLength: 5,
+    };
+    const peopleValidator: Validatable = {
+      value: people,
+      required: true,
+      min: 1,
+      max: 5,
+    };
+
     if (
-      title.trim().length === 0 ||
-      description.trim().length === 0 ||
-      people.trim().length === 0
+      !validate(titleValidator) ||
+      !validate(descriptionValidator) ||
+      !validate(peopleValidator)
     ) {
       alert('Invalid input, please try again');
       return;
