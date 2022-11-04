@@ -216,8 +216,7 @@ class ProjectInput {
     event.preventDefault();
     const userInput = this.processUserInput();
     if (Array.isArray(userInput)) {
-      const [title, description, people] = userInput;
-      projectState.addProject(title, description, people);
+      projectState.addProject(...userInput);
       this.clearInputs();
     }
   }
