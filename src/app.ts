@@ -1,6 +1,6 @@
 enum ProjectStatus {
-  Active,
-  Finished,
+  Active = 'active',
+  Finished = 'finished',
 }
 
 class Project {
@@ -113,7 +113,7 @@ class ProjectList {
   element: HTMLElement;
   assignedProjects: Project[];
 
-  constructor(private type: 'active' | 'finished') {
+  constructor(private type: ProjectStatus) {
     this.templateElement = document.getElementById(
       'project-list'
     )! as HTMLTemplateElement;
@@ -130,7 +130,10 @@ class ProjectList {
     // Add a listener that will be notified of any application state -
     // eg. a new project being added - and will re-render the project list
     projectState.addListener((projects: Project[]) => {
-      this.assignedProjects = projects;
+      // Only render projects of the correct status
+      this.assignedProjects = projects.filter((project) => {
+        return project.status === this.type;
+      });
       this.renderProjects();
     });
 
@@ -256,5 +259,5 @@ class ProjectInput {
 }
 
 const projectInput = new ProjectInput();
-const activeProjects = new ProjectList('active');
-const finishedProjects = new ProjectList('finished');
+const activeProjects = new ProjectList(ProjectStatus.Active);
+const finishedProjects = new ProjectList(ProjectStatus.Finished);
