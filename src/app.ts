@@ -1,7 +1,24 @@
+enum ProjectStatus {
+  Active,
+  Finished,
+}
+
+class Project {
+  constructor(
+    public id: string,
+    public title: string,
+    public description: string,
+    public people: number,
+    public status: ProjectStatus
+  ) {}
+}
+
+type Listener = (items: Project[]) => void;
+
 class ProjectState {
-  private projects: any[] = [];
+  private projects: Project[] = [];
   private static instance: ProjectState;
-  private listeners: any = [];
+  private listeners: Listener[] = [];
 
   // this is a singleton
   private constructor() {}
@@ -16,17 +33,18 @@ class ProjectState {
 
   // Add a function to be notified whenever the application state changes
   // eg. when a new project is added to one of the lists
-  addListener(listener: Function) {
+  addListener(listener: Listener) {
     this.listeners.push(listener);
   }
 
   addProject(title: string, description: string, people: number) {
-    const newProject = {
-      id: Math.random().toString(),
+    const newProject = new Project(
+      Math.random().toString(),
       title,
       description,
       people,
-    };
+      ProjectStatus.Active
+    );
     this.projects.push(newProject);
     // Notify all listeners that a new project has been added
     for (const listener of this.listeners) {
@@ -93,7 +111,7 @@ class ProjectList {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
   element: HTMLElement;
-  assignedProjects: any[];
+  assignedProjects: Project[];
 
   constructor(private type: 'active' | 'finished') {
     this.templateElement = document.getElementById(
@@ -111,7 +129,7 @@ class ProjectList {
 
     // Add a listener that will be notified of any application state -
     // eg. a new project being added - and will re-render the project list
-    projectState.addListener((projects: any[]) => {
+    projectState.addListener((projects: Project[]) => {
       this.assignedProjects = projects;
       this.renderProjects();
     });
