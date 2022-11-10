@@ -145,6 +145,8 @@ class ProjectList {
     const listEl = document.getElementById(
       `${this.type}- projects-list`
     )! as HTMLUListElement;
+    // Clear out the list before recreating it with the new list of projects
+    listEl.innerHTML = '';
     // Add all projects into the list
     for (const project of this.assignedProjects) {
       const listItem = document.createElement('li');
