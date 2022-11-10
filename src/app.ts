@@ -14,6 +14,8 @@ class ProjectState {
     return this.instance;
   }
 
+  // Add a function to be notified whenever the application state changes
+  // eg. when a new project is added to one of the lists
   addListener(listener: Function) {
     this.listeners.push(listener);
   }
@@ -26,6 +28,7 @@ class ProjectState {
       people,
     };
     this.projects.push(newProject);
+    // Notify all listeners that a new project has been added
     for (const listener of this.listeners) {
       // pass a copy of the original array - we don't want the listeners
       // to be able to alter it
@@ -34,6 +37,7 @@ class ProjectState {
   }
 }
 
+// Create the singleton that manages the application state
 const projectState = ProjectState.getInstance();
 
 interface Validatable {
@@ -105,6 +109,8 @@ class ProjectList {
     this.element = importedContent.firstElementChild as HTMLElement;
     this.element.id = `${this.type}-projects`;
 
+    // Add a listener that will be notified of any application state -
+    // eg. a new project being added - and will re-render the project list
     projectState.addListener((projects: any[]) => {
       this.assignedProjects = projects;
       this.renderProjects();
@@ -118,6 +124,7 @@ class ProjectList {
     const listEl = document.getElementById(
       `${this.type}- projects-list`
     )! as HTMLUListElement;
+    // Add all projects into the list
     for (const project of this.assignedProjects) {
       const listItem = document.createElement('li');
       listItem.textContent = project.title;
