@@ -13,15 +13,26 @@ class Project {
   ) {}
 }
 
-type Listener = (items: Project[]) => void;
+type Listener<T> = (items: T[]) => void;
 
-class ProjectState {
+abstract class State<T> {
+  protected listeners: Listener<T>[] = [];
+
+  // Add a function to be notified whenever the application state changes
+  // eg. when a new project is added to one of the lists
+  addListener(listener: Listener<T>) {
+    this.listeners.push(listener);
+  }
+}
+
+class ProjectState extends State<Project> {
   private projects: Project[] = [];
   private static instance: ProjectState;
-  private listeners: Listener[] = [];
 
   // this is a singleton
-  private constructor() {}
+  private constructor() {
+    super();
+  }
 
   static getInstance() {
     if (this.instance) {
@@ -29,12 +40,6 @@ class ProjectState {
     }
     this.instance = new ProjectState();
     return this.instance;
-  }
-
-  // Add a function to be notified whenever the application state changes
-  // eg. when a new project is added to one of the lists
-  addListener(listener: Listener) {
-    this.listeners.push(listener);
   }
 
   addProject(title: string, description: string, people: number) {
