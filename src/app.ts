@@ -147,12 +147,33 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     this.hostElement.insertAdjacentElement(this.insertPosition, this.element);
   }
 }
+
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+  constructor(hostId: string, private project: Project) {
+    super('single-project', hostId, 'afterbegin', project.id);
+
+    this.configure();
+    this.renderContent();
+  }
+
+  protected renderContent(): void {
+    this.element.querySelector('h2')!.textContent = this.project.title;
+    this.element.querySelector('h3')!.textContent =
+      this.project.people.toString();
+    this.element.querySelector('p')!.textContent = this.project.description;
+  }
+
+  protected configure(): void {}
+}
+
 class ProjectList extends Component<HTMLDivElement, HTMLElement> {
+  private listId: string;
   assignedProjects: Project[];
 
   constructor(private type: ProjectStatus) {
     super('project-list', 'app', 'beforeend', `${type}-projects`);
     this.assignedProjects = [];
+    this.listId = `${this.type}-projects-list`;
 
     this.configure();
     this.renderContent();
@@ -171,23 +192,20 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
   }
 
   protected renderContent() {
-    const listId = `${this.type}- projects-list`;
-    this.element.querySelector('ul')!.id = listId;
+    this.element.querySelector('ul')!.id = this.listId;
     this.element.querySelector('h2')!.textContent =
       this.type.toUpperCase() + ' PROJECTS';
   }
 
   private renderProjects() {
     const listEl = document.getElementById(
-      `${this.type}- projects-list`
+      `${this.listId}`
     )! as HTMLUListElement;
     // Clear out the list before recreating it with the new list of projects
     listEl.innerHTML = '';
     // Add all projects into the list
     for (const project of this.assignedProjects) {
-      const listItem = document.createElement('li');
-      listItem.textContent = project.title;
-      listEl.appendChild(listItem);
+      new ProjectItem(this.listId, project);
     }
   }
 }
