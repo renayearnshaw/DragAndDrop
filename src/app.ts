@@ -199,7 +199,10 @@ class ProjectItem
   }
 }
 
-class ProjectList extends Component<HTMLDivElement, HTMLElement> {
+class ProjectList
+  extends Component<HTMLDivElement, HTMLElement>
+  implements DragTarget
+{
   private listId: string;
   assignedProjects: Project[];
 
@@ -212,6 +215,22 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     this.renderContent();
   }
 
+  @autobind
+  dragOverHandler(event: DragEvent): void {
+    // Change the appearance of the project list to show it's a drop target
+    const listEl = this.element.querySelector('ul')!;
+    listEl.classList.add('droppable');
+  }
+
+  dropHandler(_: DragEvent): void {}
+
+  @autobind
+  dragLeaveHandler(event: DragEvent): void {
+    // Change the appearance of the project list to show it's no longer a drop target
+    const listEl = this.element.querySelector('ul')!;
+    listEl.classList.remove('droppable');
+  }
+
   protected configure() {
     // Add a listener that will be notified of any application state -
     // eg. a new project being added - and will re-render the project list
@@ -222,6 +241,9 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
       });
       this.renderProjects();
     });
+    this.element.addEventListener('dragover', this.dragOverHandler);
+    this.element.addEventListener('dragleave', this.dragLeaveHandler);
+    this.element.addEventListener('drop', this.dropHandler);
   }
 
   protected renderContent() {
