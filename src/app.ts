@@ -180,7 +180,8 @@ class ProjectItem
 
   @autobind
   dragStartHandler(event: DragEvent): void {
-    console.log(event);
+    event.dataTransfer!.setData('text/plain', this.project.id);
+    event.dataTransfer!.effectAllowed = 'move';
   }
 
   dragEndHandler(_: DragEvent): void {
@@ -217,17 +218,23 @@ class ProjectList
 
   @autobind
   dragOverHandler(event: DragEvent): void {
-    // Change the appearance of the project list to show it's a drop target
-    const listEl = this.element.querySelector('ul')!;
-    listEl.classList.add('droppable');
+    if (event.dataTransfer && event.dataTransfer.types[0] === 'text/plain') {
+      // Dropping is only allowed if we disable the default - which is to prevent dropping
+      event.preventDefault();
+      const listEl = this.element.querySelector('ul')!;
+      // Change the appearance of the project list to show it's a drop target
+      listEl.classList.add('droppable');
+    }
   }
 
-  dropHandler(_: DragEvent): void {}
+  dropHandler(event: DragEvent) {
+    console.log(event.dataTransfer!.getData('text/plain'));
+  }
 
   @autobind
   dragLeaveHandler(event: DragEvent): void {
-    // Change the appearance of the project list to show it's no longer a drop target
     const listEl = this.element.querySelector('ul')!;
+    // Change the appearance of the project list to show it's no longer a drop target
     listEl.classList.remove('droppable');
   }
 
