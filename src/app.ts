@@ -63,6 +63,20 @@ class ProjectState extends State<Project> {
     );
     this.projects.push(newProject);
     // Notify all listeners that a new project has been added
+    this.updateListeners();
+  }
+
+  moveProject(projectId: string, newStatus: ProjectStatus) {
+    const project = this.projects.find((project) => project.id === projectId);
+    if (project && project.status !== newStatus) {
+      project.status = newStatus;
+      // Notify all listeners that a new project has been moved
+      this.updateListeners();
+    }
+  }
+
+  private updateListeners() {
+    // Notify all listeners that a project has been added or moved
     for (const listener of this.listeners) {
       // pass a copy of the original array - we don't want the listeners
       // to be able to alter it
@@ -227,8 +241,15 @@ class ProjectList
     }
   }
 
+  @autobind
   dropHandler(event: DragEvent) {
-    console.log(event.dataTransfer!.getData('text/plain'));
+    const projectId = event.dataTransfer!.getData('text/plain');
+    projectState.moveProject(
+      projectId,
+      this.type === ProjectStatus.Active
+        ? ProjectStatus.Active
+        : ProjectStatus.Finished
+    );
   }
 
   @autobind
